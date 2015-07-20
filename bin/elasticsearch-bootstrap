@@ -1,0 +1,83 @@
+#!/bin/bash
+
+export PRIVATE_IP=$(ip addr show eth0 | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')
+
+installed ()
+{
+    echo
+    echo '#'
+    echo '# Elasticsearch is installed and configured'
+}
+
+echo
+echo '#'
+echo '# Testing to see if Elasticsearch is running yet'
+echo '#'
+
+ELASTICSEARCHRESPONSIVE=0
+while [ $ELASTICSEARCHRESPONSIVE != 1 ]; do
+    echo -n '.'
+
+    # test the default u/p
+    elasticsearch --eval "db.serverStatus().ok" &> /dev/null
+    if [ $? -eq 0 ]; then
+        let ELASTICSEARCHRESPONSIVE=1
+    else
+        sleep .7
+    fi
+done
+sleep 1
+
+echo
+echo '#'
+echo '# Checking Consul availability'
+echo '#'
+
+if [[ $CONSUL_IP && ${CONSUL_IP-x} ]]
+    then
+    export CONSUL_IP=$CONSUL_IP
+else
+    export CONSUL_IP=consul
+fi
+
+if [[ $CONSUL_PORT && ${CONSUL_PORT-x} ]]
+    then
+    export CONSUL_PORT=$CONSUL_PORT
+else
+    export CONSUL_PORT=8500
+fi
+
+curl -fs --retry 7 --retry-delay 3 http://$CONSUL_IP:$CONSUL_PORT/v1/agent/services &> /dev/null
+if [ $? -ne 0 ]
+then
+    echo '#'
+    echo '# Consul is required, but unreachable'
+    echo '#'
+    exit
+else
+    echo '# Consul instance found and responsive'
+    echo '#'
+fi
+
+ELASTICSEARCHRESPONSIVE=0
+while [ $ELASTICSEARCHRESPONSIVE != 1 ]; do
+    echo -n '.'
+
+    # test the default u/p
+    elasticsearch --eval "db.serverStatus().ok" &> /dev/null
+    if [ $? -eq 0 ]; then
+        let ELASTICSEARCHRESPONSIVE=1
+    else
+        sleep .7
+    fi
+done
+sleep 1
+
+echo
+echo '#'
+echo '# Registering service instance'
+echo '#'
+
+curl -f --retry 7 --retry-delay 3 http://$CONSUL_IP:$CONSUL_PORT/v1/agent/service/register -d "$(printf '{"ID":"elasticsearch-%s","Name":"elasticsearch","Address":"%s","Port":9200}' $PRIVATE_IP $PRIVATE_IP)"
+
+installed
