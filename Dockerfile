@@ -1,7 +1,7 @@
 #
 # Consul Elasticsearch
 #
-FROM 		elasticsearch/1.7
+FROM 		elasticsearch:1.7
 MAINTAINER 	Corbin Uselton <corbinu@decimal.io>
 
 VOLUME /usr/share/elasticsearch/data
