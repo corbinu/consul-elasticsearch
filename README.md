@@ -10,9 +10,9 @@ It can be run on its own simply via:
 
 ```
 docker run -d  -p 8400 -p 8500 -p 8600 --name consul progrium/consul -server -bootstrap -ui-dir /ui
-docker run -d --name m1 --link consul:consul corbinu/consul-elasticsearch
+docker run -d --name e1 --link consul:consul corbinu/consul-elasticsearch
 
-docker exec -it m1 elasticsearch-bootstrap
+docker exec -it e1 elasticsearch-bootstrap
 ```
 
 Consul will UI will be available on port mapped to 8500
