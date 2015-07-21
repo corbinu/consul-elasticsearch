@@ -11,25 +11,6 @@ installed ()
 
 echo
 echo '#'
-echo '# Testing to see if Elasticsearch is running yet'
-echo '#'
-
-ELASTICSEARCHRESPONSIVE=0
-while [ $ELASTICSEARCHRESPONSIVE != 1 ]; do
-    echo -n '.'
-
-    # test the default u/p
-    elasticsearch --eval "db.serverStatus().ok" &> /dev/null
-    if [ $? -eq 0 ]; then
-        let ELASTICSEARCHRESPONSIVE=1
-    else
-        sleep .7
-    fi
-done
-sleep 1
-
-echo
-echo '#'
 echo '# Checking Consul availability'
 echo '#'
 
@@ -64,7 +45,7 @@ while [ $ELASTICSEARCHRESPONSIVE != 1 ]; do
     echo -n '.'
 
     # test the default u/p
-    elasticsearch --eval "db.serverStatus().ok" &> /dev/null
+    curl http://localhost:9200 &> /dev/null
     if [ $? -eq 0 ]; then
         let ELASTICSEARCHRESPONSIVE=1
     else
