@@ -40,6 +40,11 @@ else
     echo '#'
 fi
 
+echo
+echo '#'
+echo '# Checking Elasticsearch availability'
+echo '#'
+
 ELASTICSEARCHRESPONSIVE=0
 while [ $ELASTICSEARCHRESPONSIVE != 1 ]; do
     echo -n '.'
