@@ -64,6 +64,6 @@ echo '#'
 echo '# Registering service instance'
 echo '#'
 
-curl -f --retry 7 --retry-delay 3 http://$CONSUL_IP:$CONSUL_PORT/v1/agent/service/register -d "$(printf '{"ID":"elasticsearch-%s","Name":"elasticsearch","Address":"%s","Port":9200}' $PRIVATE_IP $PRIVATE_IP)"
+curl -f --retry 7 --retry-delay 3 http://$CONSUL_IP:$CONSUL_PORT/v1/agent/service/register -d "$(printf '{"ID":"elasticsearch-%s","Name":"elasticsearch","Address":"%s","Port":9200, "Check":{"HTTP": "http://localhost:9200", "Interval": "10s"}}' $PRIVATE_IP $PRIVATE_IP)"
 
 installed
